@@ -1,0 +1,50 @@
+{
+  "name": "dsh-foxy-weibo",
+  "version": "0.1.0",
+  "description": "Foxy's Weibo transport for DeepSeek Harness: follow users, read posts, comment, reply, and remember events.",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js"
+  },
+  "files": [
+    "lib",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "foxy",
+    "weibo"
+  ],
+  "author": "Kun-Fox",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kun-Fox/dsh-foxy-weibo.git"
+  },
+  "homepage": "https://github.com/Kun-Fox/dsh-foxy-weibo#readme",
+  "bugs": {
+    "url": "https://github.com/Kun-Fox/dsh-foxy-weibo/issues"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-slots"
+      ]
+    }
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node test/test-weibo.cjs && node test/test-client.cjs"
+  }
+}

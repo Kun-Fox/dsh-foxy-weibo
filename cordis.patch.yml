@@ -1,0 +1,24 @@
+# dsh-foxy-weibo bundle patch.
+# Install with:
+#   dsh plugin --profile desktop add file:D:\...\dsh-foxy-weibo
+#
+# After restart, open Settings -> Foxy-weibo. The dashboard writes
+# ~/.dsh/foxy-weibo/settings.json; this YAML only provides first-run defaults.
+- insert:
+    - id: foxy-weibo
+      name: dsh-foxy-weibo
+      config:
+        enabled: false
+        cookie: ''
+        targetUids: []
+        intervalMinutes: 60
+        maxPostsPerRun: 5
+        commentMode: 'off'
+        maxCommentsPerDay: 1
+        replyOthers: false
+        enableMemory: true
+        memoryPresetId: 'foxy3（Character）'
+        llmBaseUrl: 'https://api.deepseek.com'
+        llmModel: 'deepseek-chat'
+        runOnStart: false
+        debug: false
