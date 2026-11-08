@@ -4,11 +4,15 @@ async function main() {
   const { parseCookie, stripHtml, normalizePost, fetchTimeline, postComment } = await import('../lib/weibo.js')
   const { normalizeUids, normalizeScheduleTimes, publicSettings } = await import('../lib/settings.js')
   const { judgePost } = await import('../lib/judge.js')
+  const { parseWeiboTime } = await import('../lib/weibo.js')
 
   assert.deepEqual(parseCookie('SUB=abc; XSRF-TOKEN=x%2Fy'), { SUB: 'abc', 'XSRF-TOKEN': 'x%2Fy' })
   assert.equal(stripHtml('<p>你好<br/>微博</p>&amp;'), '你好\n微博&')
   assert.deepEqual(normalizeUids('123456, 123456，abc 987654321'), ['123456', '987654321'])
   assert.deepEqual(normalizeScheduleTimes(['20:00', '8:00', '20:00', '23:59', '00:00']), ['00:00', '20:00', '23:59'])
+  const baseTime = new Date('2026-11-08T12:00:00+08:00').getTime()
+  assert.equal(parseWeiboTime('2026-11-07', baseTime), new Date('2026-11-07T00:00:00+08:00').getTime())
+  assert.equal(parseWeiboTime('11-07', baseTime), new Date('2026-11-07T00:00:00+08:00').getTime())
   const publicView = publicSettings({ cookie: 'secret', llmApiKey: 'sk-x' })
   assert.equal(publicView.cookie, undefined)
   assert.equal(publicView.cookieSet, true)
@@ -82,6 +86,21 @@ async function main() {
   )
   assert.equal(replyDecision.action, 'comment')
   assert.equal(replyDecision.replyTo, '88')
+
+  const postDecision = await judgePost(
+    { llmApiKey: 'test', llmBaseUrl: 'https://api.deepseek.com', llmModel: 'deepseek-chat' },
+    {
+      summary: '目标账号发了一条博文',
+      comments: [],
+      commentsText: '',
+      targetPost: { id: '5001', text: '博文正文', author: { name: '主人' } },
+      mayComment: true,
+      mayReply: false,
+      forceComment: true,
+    },
+  )
+  assert.equal(postDecision.action, 'comment')
+  assert.equal(postDecision.replyTo, '')
 
   console.log('foxy-weibo tests passed')
 }

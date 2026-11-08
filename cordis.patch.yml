@@ -14,10 +14,12 @@
         targetUids: []
         replyOwnPosts: true
         replyMode: 'off'
+        replyAfter: ''
+        learnPosts: true
         scheduleTimes:
           - '20:00'
         intervalMinutes: 60
-        maxPostsPerRun: 5
+        maxPostsPerRun: 20
         commentMode: 'off'
         maxCommentsPerDay: 1
         replyOthers: true
