@@ -10,7 +10,7 @@
       config:
         enabled: false
         cookie: ''
-        selfUid: ''
+        targetUid: ''
         targetUids: []
         replyOwnPosts: true
         replyMode: 'off'
