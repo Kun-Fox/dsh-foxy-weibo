@@ -1,8 +1,8 @@
 # dsh-foxy-weibo
 
-Foxy 的微博子插件：按 foxy3 预设关注微博账号、阅读博文、判断是否评论或记录，并通过 `foxyMemory` 写入微博事件。
+Foxy 的微博子插件：按预设关注微博账号、阅读博文、判断是否评论或记录，并通过 `foxyMemory` 写入微博事件。
 
-> 这是一个 **DSH 插件**，不是 Koishi 插件。它依赖 `dsh-foxy`（人设）和可选的 `dsh-foxy-memory`（记忆）。
+> 运行于 DSH。它依赖 `dsh-foxy`（人设）和可选的 `dsh-foxy-memory`（记忆）。
 
 ## 依赖关系
 
@@ -14,7 +14,7 @@ Foxy 的微博子插件：按 foxy3 预设关注微博账号、阅读博文、�
 
 - **阅读目标账号博文**：按设定时间阅读监控账号的博文，每篇写入一条“目标账号博文”记忆，按博文 ID 去重；
 - 可选对博文发表一级评论；可设置评论起始时间（`replyAfter`），只评论该时间之后的博文；
-- 评论前按 foxy3 预设判断 `skip / comment`，不设最少字数，最多 80 字；
+- 评论前按预设判断 `skip / comment`，不设最少字数，最多 80 字；
 - 自检去重：已评论/已跳过的博文写入 `postSeen`，不会重复评论同一篇；
 - 阅读、评论事件写入 Foxy 记忆，字段包含 `platform: weibo`、`channelType: weibo_post`、`eventType: weibo_owner_post|weibo_comment`；
 - 设置页提供扫码登录、Cookie 备用、监控账号 UID、模型、每日时间、评论模式、评论起始时间、记忆开关、调试日志与立即检查/立即回复。
@@ -28,6 +28,8 @@ dsh plugin --profile desktop add file:D:\Documents\deepseek-harness\default-work
 安装后完整重启 DSH。左侧栏会出现 **Foxy-weibo**，设置页也会出现同名条目。
 
 ## 配置
+
+判断提示词可通过设置页的「判断提示词（附加）」追加到内置提示词后；留空使用内置。自定义要求不会改变 JSON 输出格式。
 
 ### 扫码登录
 
@@ -64,7 +66,7 @@ UID 是微博用户主页 URL 里的数字 ID，例如 `https://weibo.com/u/1234
 - 模型名：例如 `deepseek-chat`
 - API Key：只保存在本机
 
-系统提示词来自 `~/.dsh/foxy/presets/foxy3.yml` 的 `persona` 字段。
+系统提示词来自 `~/.dsh/foxy/presets/preset.yml` 的 `persona` 字段。
 
 ## 建议顺序
 
