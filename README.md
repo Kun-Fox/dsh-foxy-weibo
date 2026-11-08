@@ -4,6 +4,12 @@ Foxy 的微博子插件：按 foxy3 预设关注微博账号、阅读博文、�
 
 > 这是一个 **DSH 插件**，不是 Koishi 插件。它依赖 `dsh-foxy`（人设）和可选的 `dsh-foxy-memory`（记忆）。
 
+## 依赖关系
+
+- 必需：`dsh-foxy`。
+- 记忆：`dsh-foxy-memory`；跨平台落库时可连接 `koishi-plugin-chatluna-foxy-memory`，微博事件通过 `foxyMemory` provider 写入。
+- QQ 侧记忆由 Koishi 插件管理，本插件不直接读写 Koishi 数据库。
+
 ## 功能
 
 - **阅读目标账号博文**：按设定时间阅读监控账号的博文，每篇写入一条“目标账号博文”记忆，按博文 ID 去重；
