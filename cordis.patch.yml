@@ -13,6 +13,7 @@
         targetUid: ''
         replyMode: 'off'
         replyAfter: ''
+        replyNested: true
         learnPosts: true
         scheduleTimes:
           - '20:00'
