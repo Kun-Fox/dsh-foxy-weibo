@@ -2,12 +2,13 @@ const assert = require('node:assert/strict')
 
 async function main() {
   const { parseCookie, stripHtml, normalizePost, fetchTimeline, postComment } = await import('../lib/weibo.js')
-  const { normalizeUids, publicSettings } = await import('../lib/settings.js')
+  const { normalizeUids, normalizeScheduleTimes, publicSettings } = await import('../lib/settings.js')
   const { judgePost } = await import('../lib/judge.js')
 
   assert.deepEqual(parseCookie('SUB=abc; XSRF-TOKEN=x%2Fy'), { SUB: 'abc', 'XSRF-TOKEN': 'x%2Fy' })
   assert.equal(stripHtml('<p>你好<br/>微博</p>&amp;'), '你好\n微博&')
   assert.deepEqual(normalizeUids('123456, 123456，abc 987654321'), ['123456', '987654321'])
+  assert.deepEqual(normalizeScheduleTimes(['20:00', '8:00', '20:00', '23:59', '00:00']), ['00:00', '20:00', '23:59'])
   const publicView = publicSettings({ cookie: 'secret', llmApiKey: 'sk-x' })
   assert.equal(publicView.cookie, undefined)
   assert.equal(publicView.cookieSet, true)
@@ -63,6 +64,24 @@ async function main() {
   )
   assert.equal(decision.action, 'remember')
   assert.match(decision.memory, /微博/)
+
+  globalThis.fetch = async () =>
+    new Response(JSON.stringify({ choices: [{ message: { content: '{"action":"comment","comment":"这句回复你"}' } }] }), {
+      status: 200,
+    })
+  const replyDecision = await judgePost(
+    { llmApiKey: 'test', llmBaseUrl: 'https://api.deepseek.com', llmModel: 'deepseek-chat' },
+    {
+      summary: '博文',
+      comments: [{ cid: '88', text: '原评论', author: { uid: '9', name: '网友' } }],
+      commentsText: '网友：原评论',
+      targetComment: { cid: '88', text: '原评论', author: { uid: '9', name: '网友' } },
+      mayComment: true,
+      mayReply: true,
+    },
+  )
+  assert.equal(replyDecision.action, 'comment')
+  assert.equal(replyDecision.replyTo, '88')
 
   console.log('foxy-weibo tests passed')
 }

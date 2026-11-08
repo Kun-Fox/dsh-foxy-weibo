@@ -10,12 +10,17 @@
       config:
         enabled: false
         cookie: ''
+        selfUid: ''
         targetUids: []
+        replyOwnPosts: true
+        replyMode: 'off'
+        scheduleTimes:
+          - '20:00'
         intervalMinutes: 60
         maxPostsPerRun: 5
         commentMode: 'off'
         maxCommentsPerDay: 1
-        replyOthers: false
+        replyOthers: true
         enableMemory: true
         memoryPresetId: 'foxy3（Character）'
         llmBaseUrl: 'https://api.deepseek.com'
