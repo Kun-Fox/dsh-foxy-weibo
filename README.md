@@ -10,9 +10,8 @@ Foxy 的微博子插件：按 foxy3 预设关注微博账号、阅读博文、�
 - 可选对博文发表一级评论；可设置评论起始时间（`replyAfter`），只评论该时间之后的博文；
 - 评论前按 foxy3 预设判断 `skip / comment`，不设最少字数，最多 80 字；
 - 自检去重：已评论/已跳过的博文写入 `postSeen`，不会重复评论同一篇；
-- 旧模式保留：关注一个或多个微博 UID，定时读取时间线并评论（`replyOwnPosts: false`）；
 - 阅读、评论事件写入 Foxy 记忆，字段包含 `platform: weibo`、`channelType: weibo_post`、`eventType: weibo_owner_post|weibo_comment`；
-- 设置页提供扫码登录、Cookie 备用、监控账号 UID、关注 UID、模型、每日时间、评论模式、评论起始时间、记忆开关、调试日志与立即检查/立即回复。
+- 设置页提供扫码登录、Cookie 备用、监控账号 UID、模型、每日时间、评论模式、评论起始时间、记忆开关、调试日志与立即检查/立即回复。
 
 ## 安装
 
@@ -45,11 +44,11 @@ dsh plugin --profile desktop add file:D:\Documents\deepseek-harness\default-work
 
 Cookie 只保存在本机 `~/.dsh/foxy-weibo/settings.json`，不会回传给前端。插件优先使用 `m.weibo.cn`，失败时用 `weibo.com/ajax/statuses/mymblog` 作为备用接口。
 
-### 自己的 UID / 关注 UID
+### 监控账号 UID
 
 `监控账号 UID` 是被阅读、被评论的目标账号（通常是主人账号）；`当前账号` 是扫码登录的机器人账号，两者可以不同。插件不会把登录的机器人账号当成监控账号。
 
-`关注 UID` 是旧模式使用，多个 UID 用逗号分隔，最多 20 个。UID 是微博用户主页 URL 里的数字 ID，例如 `https://weibo.com/u/1234567890`。
+UID 是微博用户主页 URL 里的数字 ID，例如 `https://weibo.com/u/1234567890`。
 
 ### AI 模型
 

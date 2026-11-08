@@ -11,18 +11,13 @@
         enabled: false
         cookie: ''
         targetUid: ''
-        targetUids: []
-        replyOwnPosts: true
         replyMode: 'off'
         replyAfter: ''
         learnPosts: true
         scheduleTimes:
           - '20:00'
-        intervalMinutes: 60
         maxPostsPerRun: 20
-        commentMode: 'off'
         maxCommentsPerDay: 1
-        replyOthers: true
         enableMemory: true
         memoryPresetId: 'foxy3（Character）'
         llmBaseUrl: 'https://api.deepseek.com'
