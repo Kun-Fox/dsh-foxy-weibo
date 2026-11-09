@@ -1,6 +1,6 @@
 {
   "name": "dsh-foxy-weibo",
-  "version": "0.3.9",
+  "version": "0.3.10",
   "description": "Foxy's Weibo transport for DeepSeek Harness: follow users, read posts, comment, reply, and remember events.",
   "type": "module",
   "main": "lib/index.js",
