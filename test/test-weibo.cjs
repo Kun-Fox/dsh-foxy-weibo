@@ -1,10 +1,18 @@
 const assert = require('node:assert/strict')
 
 async function main() {
-  const { parseCookie, stripHtml, normalizePost, fetchTimeline, postComment } = await import('../lib/weibo.js')
+  const {
+    parseCookie,
+    stripHtml,
+    normalizePost,
+    fetchTimeline,
+    fetchChildComments,
+    postComment,
+  } = await import('../lib/weibo.js')
   const { normalizeUids, normalizeScheduleTimes, publicSettings } = await import('../lib/settings.js')
   const { judgePost } = await import('../lib/judge.js')
   const { parseWeiboTime } = await import('../lib/weibo.js')
+  const { scanNestedReplies } = await import('../lib/index.js')
 
   assert.deepEqual(parseCookie('SUB=abc; XSRF-TOKEN=x%2Fy'), { SUB: 'abc', 'XSRF-TOKEN': 'x%2Fy' })
   assert.equal(stripHtml('<p>你好<br/>微博</p>&amp;'), '你好\n微博&')
@@ -49,6 +57,19 @@ async function main() {
   const posts = await fetchTimeline('12345', { cookie: 'SUB=x' })
   assert.equal(posts.length, 1)
   assert.equal(posts[0].text, 'hello')
+
+  globalThis.fetch = async () =>
+    new Response(
+      JSON.stringify({
+        ok: 1,
+        data: [{ id: 'child-1', rootid: 'bot-1', user: { id: 9, screen_name: '网友' }, text: '楼中楼' }],
+      }),
+      { status: 200, headers: { 'content-type': 'application/json' } },
+    )
+  const children = await fetchChildComments('bot-1', { cookie: 'SUB=x' }, 10)
+  assert.equal(children.length, 1)
+  assert.equal(children[0].cid, 'child-1')
+  assert.equal(children[0].rootid, 'bot-1')
 
   let captured
   globalThis.fetch = async (url, options = {}) => {
@@ -104,6 +125,122 @@ async function main() {
   )
   assert.equal(postDecision.action, 'comment')
   assert.equal(postDecision.replyTo, '')
+
+  let nestedCaptured
+  globalThis.fetch = async (url, options = {}) => {
+    const target = String(url)
+    if (target.includes('comments/hotflow')) {
+      return new Response(
+        JSON.stringify({
+          data: {
+            data: [
+              {
+                id: 'bot1',
+                rootid: 'bot1',
+                user: { id: 7, screen_name: 'AiFoxy' },
+                text: 'bot comment',
+                comments: [
+                  {
+                    id: 'child1',
+                    rootid: 'bot1',
+                    user: { id: 9, screen_name: 'kunfox' },
+                    text: 'child comment',
+                  },
+                ],
+              },
+            ],
+          },
+        }),
+        { status: 200, headers: { 'content-type': 'application/json' } },
+      )
+    }
+    if (target.includes('ajax/statuses/buildComments')) {
+      return new Response(
+        JSON.stringify({
+          ok: 1,
+          data: [
+            {
+              id: 'child1',
+              rootid: 'bot1',
+              user: { id: 9, screen_name: 'kunfox' },
+              text: 'child comment',
+            },
+          ],
+        }),
+        { status: 200, headers: { 'content-type': 'application/json' } },
+      )
+    }
+    if (target.includes('comments/create')) {
+      nestedCaptured = options
+      return new Response(JSON.stringify({ ok: 1, data: { id: 'reply1' } }), { status: 200 })
+    }
+    if (target.includes('chat/completions')) {
+      return new Response(
+        JSON.stringify({
+          choices: [{ message: { content: '{"action":"comment","comment":"回复楼中楼"}' } }],
+        }),
+        { status: 200 },
+      )
+    }
+    throw new Error(`unexpected fetch ${target}`)
+  }
+  const state = { postSeen: {}, commentSeen: {}, debug: [] }
+  const ctx = {
+    get: () => ({ record: async () => ({ ok: true }), context: async () => '' }),
+    logger: { info() {}, warn() {} },
+  }
+  const nestedConfig = {
+    cookie: 'SUB=x; XSRF-TOKEN=t',
+    targetUid: '1',
+    accountUid: '7',
+    llmApiKey: 'x',
+    llmBaseUrl: 'https://api.deepseek.com',
+    llmModel: 'deepseek-chat',
+    replyMode: 'auto',
+    replyNested: true,
+    maxPostsPerRun: 1,
+    maxCommentsPerDay: 1,
+    memoryPresetId: 'p',
+    enableMemory: true,
+  }
+  const postsWithNested = [
+    {
+      id: 'post1',
+      mid: 'post1',
+      text: 'hi',
+      author: { uid: '1', name: 'owner' },
+      commentsCount: 1,
+      url: 'https://weibo.com/1/post1',
+    },
+  ]
+  const dry = await scanNestedReplies(
+    ctx,
+    nestedConfig,
+    state,
+    () => {},
+    postsWithNested,
+    '7',
+    '',
+    { dryRun: true },
+  )
+  assert.equal(dry.checked, 1)
+  assert.equal(dry.items[0].action, 'pending-reply')
+  assert.equal(dry.items[0].commentId, 'child1')
+  assert.deepEqual(state.commentSeen, {})
+
+  const actualReply = await scanNestedReplies(
+    ctx,
+    nestedConfig,
+    state,
+    () => {},
+    postsWithNested,
+    '7',
+    '',
+    {},
+  )
+  assert.equal(actualReply.replied, 1)
+  assert.match(String(nestedCaptured.body), /cid=child1/)
+  assert.equal(state.commentSeen.child1.status, 'replied')
 
   console.log('foxy-weibo tests passed')
 }
