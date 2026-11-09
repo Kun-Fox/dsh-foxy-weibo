@@ -18,7 +18,8 @@ Foxy 的微博子插件：按预设关注微博账号、阅读博文、判断是
 - 可读取 Foxy 已有记忆作为判断上下文；支持回复博文下针对 Foxy 评论的楼中楼（含接口未内联返回时按评论 cid 拉取子评论）；
 - 自检去重：已评论/已跳过的博文写入 `postSeen`，不会重复评论同一篇；运行前还会检查博文下是否已有本账号评论，避免 state 重置后重复评论；
 - 跨进程状态锁：同一 `DSH_HOME` 下多个 DSH 实例不会同时扫描并互相覆盖 `state.json`；
-- 阅读、评论事件写入 Foxy 记忆，字段包含 `platform: weibo`、`channelType: weibo_post`、`eventType: weibo_owner_post|weibo_comment`；
+- 阅读、评论事件写入 Foxy 记忆，字段包含 `platform: weibo`、`channelType: weibo_post`、`eventType: weibo_owner_post|weibo_comment`；博文记忆由预设提炼为 1–2 句，日期只到天，不保存全文、图片地址或博文链接；
+- 回复楼中楼使用 `POST https://weibo.com/ajax/comments/reply`（`id` + `cid` + `comment`），并带 `without_mention=1`，避免额外 @；
 - 设置页提供扫码登录、Cookie 备用、监控账号 UID、模型、每日时间、评论模式、评论起始时间、楼中楼回复开关、记忆开关、调试日志，以及「立即检查博文 / 立即读取博文 / 立即回复」。
 
 ## 安装

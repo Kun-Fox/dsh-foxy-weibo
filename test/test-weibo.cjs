@@ -127,6 +127,7 @@ async function main() {
   assert.equal(postDecision.replyTo, '')
 
   let nestedCaptured
+  let nestedUrl
   globalThis.fetch = async (url, options = {}) => {
     const target = String(url)
     if (target.includes('comments/hotflow')) {
@@ -170,7 +171,8 @@ async function main() {
         { status: 200, headers: { 'content-type': 'application/json' } },
       )
     }
-    if (target.includes('comments/create')) {
+    if (target.includes('comments/reply') || target.includes('comments/create')) {
+      nestedUrl = target
       nestedCaptured = options
       return new Response(JSON.stringify({ ok: 1, data: { id: 'reply1' } }), { status: 200 })
     }
@@ -239,7 +241,9 @@ async function main() {
     {},
   )
   assert.equal(actualReply.replied, 1)
+  assert.match(nestedUrl, /comments\/reply/);
   assert.match(String(nestedCaptured.body), /cid=child1/)
+  assert.match(String(nestedCaptured.body), /without_mention=1/)
   assert.equal(state.commentSeen.child1.status, 'replied')
 
   console.log('foxy-weibo tests passed')
@@ -249,3 +253,4 @@ main().catch((error) => {
   console.error(error)
   process.exit(1)
 })
+
