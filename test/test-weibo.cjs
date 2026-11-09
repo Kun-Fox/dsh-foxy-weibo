@@ -12,7 +12,7 @@ async function main() {
   const { normalizeUids, normalizeScheduleTimes, publicSettings } = await import('../lib/settings.js')
   const { judgePost } = await import('../lib/judge.js')
   const { parseWeiboTime } = await import('../lib/weibo.js')
-  const { scanNestedReplies } = await import('../lib/index.js')
+  const { groupPostsByUnit, scanNestedReplies } = await import('../lib/index.js')
 
   assert.deepEqual(parseCookie('SUB=abc; XSRF-TOKEN=x%2Fy'), { SUB: 'abc', 'XSRF-TOKEN': 'x%2Fy' })
   assert.equal(stripHtml('<p>你好<br/>微博</p>&amp;'), '你好\n微博&')
@@ -245,6 +245,28 @@ async function main() {
   assert.match(String(nestedCaptured.body), /cid=child1/)
   assert.match(String(nestedCaptured.body), /without_mention=1/)
   assert.equal(state.commentSeen.child1.status, 'replied')
+
+  const grouped = groupPostsByUnit(
+    [
+      { id: 'a', createdAtMs: new Date('2026-01-01T10:00:00+08:00').getTime() },
+      { id: 'b', createdAtMs: new Date('2026-01-20T10:00:00+08:00').getTime() },
+      { id: 'c', createdAtMs: new Date('2026-02-02T10:00:00+08:00').getTime() },
+    ],
+    'month',
+  )
+  assert.deepEqual(grouped.map((group) => group.key), ['2026-01', '2026-02'])
+  assert.equal(grouped[0].posts.length, 2)
+  assert.equal(grouped[0].startText, '2026-01-01')
+  assert.equal(grouped[0].endText, '2026-01-31')
+
+  const yearly = groupPostsByUnit(
+    [
+      { id: 'a', createdAtMs: new Date('2025-12-31T10:00:00+08:00').getTime() },
+      { id: 'b', createdAtMs: new Date('2026-01-01T10:00:00+08:00').getTime() },
+    ],
+    'year',
+  )
+  assert.deepEqual(yearly.map((group) => group.key), ['2025', '2026'])
 
   console.log('foxy-weibo tests passed')
 }
