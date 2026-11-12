@@ -38,12 +38,14 @@ async function main() {
     },
   }
   clientModule.apply(ctx)
-  assert.equal(registered.length, 3)
-  assert.deepEqual(registered.map((x) => x.name), ['main', 'sidebar.panellist', 'settings.section'])
+  assert.equal(registered.length, 2)
+  assert.deepEqual(registered.map((x) => x.name), ['main', 'settings.section'])
   assert.equal(registered[0].key, 'dsh-foxy-weibo')
-  assert.equal(registered[1].id, 'dsh-foxy-weibo')
-  assert.equal(registered[1].label(), 'Foxy-weibo')
-  assert.equal(registered[2].id, 'foxy-weibo')
+  assert.equal(registered[1].id, 'foxy-weibo')
+  const page = globalThis.window.__FOXY_CONSOLE__.pages.find((item) => item.id === 'dsh-foxy-weibo')
+  assert.ok(page)
+  assert.equal(page.label, '微博')
+  assert.equal(page.order, 14)
   console.log('foxy-weibo client tests passed')
 }
 

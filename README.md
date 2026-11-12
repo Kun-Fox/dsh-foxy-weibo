@@ -29,7 +29,7 @@ Foxy 的微博子插件：按预设关注微博账号、阅读博文、判断是
 dsh plugin --profile desktop add file:D:\Documents\deepseek-harness\default-workspace\dsh-foxy-weibo
 ```
 
-安装后完整重启 DSH。左侧栏会出现 **Foxy-weibo**，设置页也会出现同名条目。
+安装后完整重启 DSH。入口在 **Foxy → 微博**，设置页也会出现同名条目。
 
 ## 配置
 
