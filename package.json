@@ -45,6 +45,6 @@
     "node": ">=20"
   },
   "scripts": {
-    "test": "node test/test-weibo.cjs && node test/test-client.cjs"
+    "test": "node test/test-weibo.cjs && node test/test-client.cjs && node test/test-auto-read.cjs"
   }
 }
